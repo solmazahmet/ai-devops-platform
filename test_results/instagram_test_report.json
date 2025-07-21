@@ -1,0 +1,60 @@
+{
+  "command": "Instagram test et",
+  "ai_analysis": {
+    "parsed_intent": "test_platform",
+    "platform": "instagram",
+    "test_type": "functional",
+    "confidence": 0.7
+  },
+  "test_strategy": {
+    "platform": "instagram",
+    "test_type": "functional",
+    "steps": [
+      "1. Instagram ana sayfasını aç ve sayfa yüklenmesini kontrol et",
+      "2. Login formunu bul ve form elemanlarını doğrula",
+      "3. Test kullanıcı bilgileri ile login formunu doldur",
+      "4. Login butonuna tıkla ve sonucu kontrol et",
+      "5. Ana feed sayfasının yüklenmesini bekle",
+      "6. Navigasyon menüsünü kontrol et (Home, Search, Reels, etc.)",
+      "7. Profil sayfasına git ve profil bilgilerini kontrol et",
+      "8. Post oluşturma butonunu bul ve tıkla",
+      "9. Story oluşturma özelliğini kontrol et",
+      "10. Arama fonksiyonunu test et",
+      "11. Ekran görüntüleri al ve test raporu oluştur"
+    ],
+    "priority": "high",
+    "estimated_time": "10-15 minutes",
+    "test_scenarios": [
+      {
+        "name": "Login Test",
+        "description": "Instagram login formunun çalışmasını test et",
+        "priority": "high"
+      },
+      {
+        "name": "Navigation Test",
+        "description": "Ana navigasyon menüsünün çalışmasını test et",
+        "priority": "medium"
+      },
+      {
+        "name": "Profile Test",
+        "description": "Profil sayfasının yüklenmesini test et",
+        "priority": "medium"
+      }
+    ]
+  },
+  "automation_results": {
+    "success": false,
+    "steps": [
+      "Instagram ana sayfasına gidiliyor..."
+    ],
+    "screenshots": [],
+    "errors": [
+      "Instagram ana sayfasına gidilemedi"
+    ],
+    "test_duration": 0,
+    "page_load_time": 0,
+    "elements_found": 0,
+    "test_summary": {}
+  },
+  "timestamp": 1752751915.0552826
+}

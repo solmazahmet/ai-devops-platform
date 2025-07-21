@@ -1,0 +1,79 @@
+{
+  "platform": "twitter",
+  "test_type": "performance",
+  "start_time": "2025-07-17T19:21:31.630965",
+  "end_time": "2025-07-17T19:22:07.256665",
+  "total_duration": 35.6257,
+  "success": false,
+  "error_count": 1,
+  "success_count": 3,
+  "element_success_rate": 0.25,
+  "avg_step_duration": 5.218819558620453,
+  "total_screenshots": 4,
+  "screenshots": [
+    "test_results\\twitter_final_1752769327.png"
+  ],
+  "test_summary": {
+    "total_steps": 4,
+    "successful_steps": 3,
+    "failed_steps": 1,
+    "success_rate": 0.75,
+    "element_success_rate": 0.25,
+    "avg_step_duration": 5.218819558620453,
+    "total_duration": 35.6257,
+    "screenshots_taken": 4,
+    "platform": "twitter",
+    "test_type": "performance",
+    "webdriver_status": "success"
+  },
+  "steps": [
+    {
+      "step_type": "navigate",
+      "description": "twitter ana sayfasını aç",
+      "success": true,
+      "error_message": null,
+      "duration": 3.1189253330230713,
+      "screenshot_path": "test_results/screenshots\\twitter_homepage_1752769309.png",
+      "element_found": false,
+      "element_selector_used": null,
+      "wait_time": 0.0,
+      "retry_count": 0
+    },
+    {
+      "step_type": "check_title",
+      "description": "Sayfa başlığını kontrol et",
+      "success": false,
+      "error_message": "Sayfa başlığı beklenmeyen: X. It’s what’s happening / X",
+      "duration": 0.19604206085205078,
+      "screenshot_path": "test_results/screenshots\\twitter_title_check_1752769309.png",
+      "element_found": false,
+      "element_selector_used": null,
+      "wait_time": 0.0,
+      "retry_count": 0
+    },
+    {
+      "step_type": "check_elements",
+      "description": "Temel elementleri kontrol et",
+      "success": true,
+      "error_message": null,
+      "duration": 17.42076015472412,
+      "screenshot_path": "test_results/screenshots\\twitter_elements_check_1752769326.png",
+      "element_found": true,
+      "element_selector_used": null,
+      "wait_time": 0.0,
+      "retry_count": 0
+    },
+    {
+      "step_type": "screenshot",
+      "description": "Final ekran görüntüsü",
+      "success": true,
+      "error_message": null,
+      "duration": 0.13955068588256836,
+      "screenshot_path": "test_results\\twitter_final_1752769327.png",
+      "element_found": false,
+      "element_selector_used": null,
+      "wait_time": 0.0,
+      "retry_count": 0
+    }
+  ]
+}

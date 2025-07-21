@@ -1,0 +1,57 @@
+{
+  "platform": "youtube",
+  "test_type": "ui",
+  "start_time": "2025-07-17T15:13:14.834948",
+  "end_time": "2025-07-17T15:13:51.733752",
+  "total_duration": 36.898804,
+  "success": false,
+  "error_count": 1,
+  "success_count": 3,
+  "screenshots": [
+    "test_results\\youtube_test_1752754431.png"
+  ],
+  "test_summary": {
+    "total_steps": 4,
+    "successful_steps": 3,
+    "failed_steps": 1,
+    "success_rate": 0.75,
+    "total_duration": 36.898804,
+    "screenshots_taken": 1,
+    "platform": "youtube",
+    "test_type": "ui"
+  },
+  "steps": [
+    {
+      "step_type": "navigate",
+      "description": "youtube ana sayfasını aç",
+      "success": true,
+      "error_message": null,
+      "duration": 3.002392053604126,
+      "screenshot_path": null
+    },
+    {
+      "step_type": "check_title",
+      "description": "Sayfa başlığını kontrol et",
+      "success": true,
+      "error_message": null,
+      "duration": 0.06602644920349121,
+      "screenshot_path": null
+    },
+    {
+      "step_type": "check_elements",
+      "description": "Temel elementleri kontrol et",
+      "success": false,
+      "error_message": "Yeterli temel element bulunamadı: 0",
+      "duration": 31.802614450454712,
+      "screenshot_path": null
+    },
+    {
+      "step_type": "screenshot",
+      "description": "Final ekran görüntüsü al",
+      "success": true,
+      "error_message": null,
+      "duration": 0.1274263858795166,
+      "screenshot_path": "test_results\\youtube_test_1752754431.png"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "platform": "facebook",
+  "test_type": "functional",
+  "start_time": "2025-07-17T18:30:55.413023",
+  "end_time": "2025-07-17T19:21:16.629397",
+  "total_duration": 3021.216374,
+  "success": false,
+  "error_count": 2,
+  "success_count": 2,
+  "element_success_rate": 0.0,
+  "avg_step_duration": 754.8527331352234,
+  "total_screenshots": 2,
+  "screenshots": [],
+  "test_summary": {
+    "total_steps": 4,
+    "successful_steps": 2,
+    "failed_steps": 2,
+    "success_rate": 0.5,
+    "element_success_rate": 0.0,
+    "avg_step_duration": 754.8527331352234,
+    "total_duration": 3021.216374,
+    "screenshots_taken": 2,
+    "platform": "facebook",
+    "test_type": "functional",
+    "webdriver_status": "success"
+  },
+  "steps": [
+    {
+      "step_type": "navigate",
+      "description": "facebook ana sayfasını aç",
+      "success": true,
+      "error_message": null,
+      "duration": 1.047456979751587,
+      "screenshot_path": "test_results/screenshots\\facebook_homepage_1752766258.png",
+      "element_found": false,
+      "element_selector_used": null,
+      "wait_time": 0.0,
+      "retry_count": 0
+    },
+    {
+      "step_type": "check_title",
+      "description": "Sayfa başlığını kontrol et",
+      "success": true,
+      "error_message": null,
+      "duration": 0.18766570091247559,
+      "screenshot_path": "test_results/screenshots\\facebook_title_check_1752766258.png",
+      "element_found": false,
+      "element_selector_used": null,
+      "wait_time": 0.0,
+      "retry_count": 0
+    },
+    {
+      "step_type": "check_elements",
+      "description": "Temel elementleri kontrol et",
+      "success": false,
+      "error_message": "Yeterli temel element bulunamadı: 0",
+      "duration": 3018.0500564575195,
+      "screenshot_path": null,
+      "element_found": false,
+      "element_selector_used": null,
+      "wait_time": 0.0,
+      "retry_count": 0
+    },
+    {
+      "step_type": "screenshot",
+      "description": "Final ekran görüntüsü",
+      "success": false,
+      "error_message": "Final screenshot alınamadı",
+      "duration": 0.12575340270996094,
+      "screenshot_path": null,
+      "element_found": false,
+      "element_selector_used": null,
+      "wait_time": 0.0,
+      "retry_count": 0
+    }
+  ]
+}

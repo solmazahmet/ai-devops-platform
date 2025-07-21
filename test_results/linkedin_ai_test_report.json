@@ -1,0 +1,57 @@
+{
+  "platform": "linkedin",
+  "test_type": "security",
+  "start_time": "2025-07-17T15:22:54.462952",
+  "end_time": "2025-07-17T15:22:58.791160",
+  "total_duration": 4.328208,
+  "success": true,
+  "error_count": 0,
+  "success_count": 4,
+  "screenshots": [
+    "test_results\\linkedin_test_1752754978.png"
+  ],
+  "test_summary": {
+    "total_steps": 4,
+    "successful_steps": 4,
+    "failed_steps": 0,
+    "success_rate": 1.0,
+    "total_duration": 4.328208,
+    "screenshots_taken": 1,
+    "platform": "linkedin",
+    "test_type": "security"
+  },
+  "steps": [
+    {
+      "step_type": "navigate",
+      "description": "linkedin ana sayfasını aç",
+      "success": true,
+      "error_message": null,
+      "duration": 1.5737042427062988,
+      "screenshot_path": null
+    },
+    {
+      "step_type": "check_title",
+      "description": "Sayfa başlığını kontrol et",
+      "success": true,
+      "error_message": null,
+      "duration": 0.28186631202697754,
+      "screenshot_path": null
+    },
+    {
+      "step_type": "check_elements",
+      "description": "Temel elementleri kontrol et",
+      "success": true,
+      "error_message": null,
+      "duration": 0.15122246742248535,
+      "screenshot_path": null
+    },
+    {
+      "step_type": "screenshot",
+      "description": "Final ekran görüntüsü al",
+      "success": true,
+      "error_message": null,
+      "duration": 0.18922019004821777,
+      "screenshot_path": "test_results\\linkedin_test_1752754978.png"
+    }
+  ]
+}

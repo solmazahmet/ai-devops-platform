@@ -1,0 +1,42 @@
+{
+  "command": "LinkedIn güvenlik testi",
+  "ai_analysis": {
+    "parsed_intent": "test_platform",
+    "platform": "linkedin",
+    "test_type": "security",
+    "confidence": 0.7
+  },
+  "test_strategy": {
+    "platform": "linkedin",
+    "test_type": "security",
+    "steps": [
+      "1. Platform test",
+      "2. Feature test",
+      "3. Validation"
+    ],
+    "priority": "medium",
+    "estimated_time": "5-10 minutes",
+    "test_scenarios": [
+      {
+        "name": "Default Test",
+        "description": "Varsayılan test senaryosu",
+        "priority": "medium"
+      }
+    ]
+  },
+  "automation_results": {
+    "success": false,
+    "steps": [
+      "https://www.linkedin.com adresine gidiliyor..."
+    ],
+    "screenshots": [],
+    "errors": [
+      "https://www.linkedin.com adresine gidilemedi"
+    ],
+    "test_duration": 0,
+    "page_load_time": 0,
+    "elements_found": 0,
+    "test_summary": {}
+  },
+  "timestamp": 1752751956.691814
+}

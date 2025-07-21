@@ -1,0 +1,42 @@
+{
+  "command": "Twitter performans testi yap",
+  "ai_analysis": {
+    "parsed_intent": "test_platform",
+    "platform": "twitter",
+    "test_type": "performance",
+    "confidence": 0.7
+  },
+  "test_strategy": {
+    "platform": "twitter",
+    "test_type": "performance",
+    "steps": [
+      "1. Platform test",
+      "2. Feature test",
+      "3. Validation"
+    ],
+    "priority": "medium",
+    "estimated_time": "5-10 minutes",
+    "test_scenarios": [
+      {
+        "name": "Default Test",
+        "description": "Varsayılan test senaryosu",
+        "priority": "medium"
+      }
+    ]
+  },
+  "automation_results": {
+    "success": false,
+    "steps": [
+      "https://www.twitter.com adresine gidiliyor..."
+    ],
+    "screenshots": [],
+    "errors": [
+      "https://www.twitter.com adresine gidilemedi"
+    ],
+    "test_duration": 0,
+    "page_load_time": 0,
+    "elements_found": 0,
+    "test_summary": {}
+  },
+  "timestamp": 1752751873.8883781
+}
