@@ -167,6 +167,9 @@ def validate_settings() -> None:
         if not settings.SECRET_KEY or settings.SECRET_KEY == "your-secret-key-change-in-production":
             errors.append("Production ortamında SECRET_KEY ayarlanmalıdır")
         
+        if len(settings.SECRET_KEY) < 32:
+            errors.append("SECRET_KEY en az 32 karakter olmalıdır")
+        
         if not settings.OPENAI_API_KEY:
             errors.append("Production ortamında OPENAI_API_KEY ayarlanmalıdır")
         
@@ -178,6 +181,10 @@ def validate_settings() -> None:
         
         if "*" in settings.CORS_ORIGINS:
             errors.append("Production ortamında CORS_ORIGINS wildcard kullanılmamalıdır")
+    
+    # OpenAI API Key kontrolü (kritik)
+    if not settings.OPENAI_API_KEY:
+        errors.append("OPENAI_API_KEY gereklidir")
     
     # Database URL kontrolü
     if not settings.DATABASE_URL:

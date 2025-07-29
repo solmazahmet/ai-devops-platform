@@ -17,6 +17,7 @@ import time
 import json
 from datetime import datetime
 from json import JSONEncoder
+import aiofiles
 
 # Import AI components
 from app.integrations.openai_client import OpenAIClient
@@ -36,13 +37,16 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS middleware
+# CORS middleware with secure configuration
+from app.core.config import get_cors_config
+
+cors_config = get_cors_config()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=cors_config["allow_origins"],
+    allow_credentials=cors_config["allow_credentials"],
+    allow_methods=cors_config["allow_methods"],
+    allow_headers=cors_config["allow_headers"],
 )
 
 # Custom JSON Encoder for datetime objects
@@ -544,10 +548,12 @@ async def get_test_report(filename: str):
             )
         
         # Security check - prevent directory traversal
-        if ".." in filename or "/" in filename or "\\" in filename:
+        safe_path = os.path.abspath(os.path.join("test_results", filename))
+        allowed_path = os.path.abspath("test_results")
+        if not safe_path.startswith(allowed_path):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid filename"
+                detail="Invalid filename - directory traversal not allowed"
             )
         
         report_path = os.path.join("test_results", filename)
@@ -557,8 +563,16 @@ async def get_test_report(filename: str):
                 detail="Test raporu bulunamadı"
             )
         
-        with open(report_path, 'r', encoding='utf-8') as f:
-            report_data = json.load(f)
+        # Use async file operations for better performance
+        try:
+            async with aiofiles.open(safe_path, 'r', encoding='utf-8') as f:
+                content = await f.read()
+                report_data = json.loads(content)
+        except FileNotFoundError:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Test raporu bulunamadı"
+            )
         
         return {
             "filename": filename,
