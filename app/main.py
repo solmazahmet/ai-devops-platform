@@ -616,6 +616,10 @@ async def get_automation_status():
             detail=str(e)
         )
 
+@app.get("/hello")
+async def hello_world():
+    return {"message": "Hello World!"}
+
 @app.get("/")
 async def root():
     return {
@@ -623,6 +627,7 @@ async def root():
         "version": "1.0.0",
         "endpoints": {
             "health": "/health",
+            "hello": "/hello",
             "ai_command": "/api/v1/ai/command",
             "ai_config": "/api/v1/ai/config",
             "platform_test": "/api/v1/ai/test/{platform}",
