@@ -48,7 +48,7 @@ class TestResult(Base):
     environment = Column(String(100), nullable=True)
     browser = Column(String(100), nullable=True)
     os = Column(String(100), nullable=True)
-    metadata = Column(JSON, nullable=True)
+    test_metadata = Column(JSON, nullable=True)
     created_by = Column(String(255), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     

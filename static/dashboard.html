@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI DevOps Platform - Analytics Dashboard</title>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #16a34a;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --info-color: #0891b2;
+            --dark-color: #1e293b;
+            --light-color: #f8fafc;
+        }
+
+        body {
+            background-color: var(--light-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .metric-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-change {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            margin-top: 0.5rem;
+        }
+
+        .trend-up {
+            background-color: #dcfce7;
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            background-color: #fef2f2;
+            color: var(--danger-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.2s ease;
+        }
+
+        .activity-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .activity-icon.success {
+            background-color: #dcfce7;
+            color: var(--success-color);
+        }
+
+        .activity-icon.error {
+            background-color: #fef2f2;
+            color: var(--danger-color);
+        }
+
+        .activity-icon.warning {
+            background-color: #fef3c7;
+            color: var(--warning-color);
+        }
+
+        .insight-card {
+            border-left: 4px solid var(--info-color);
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        }
+
+        .insight-card.warning {
+            border-left-color: var(--warning-color);
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .platform-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .platform-instagram {
+            background-color: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .platform-facebook {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .platform-twitter {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-passed {
+            background-color: #dcfce7;
+            color: var(--success-color);
+        }
+
+        .status-failed {
+            background-color: #fef2f2;
+            color: var(--danger-color);
+        }
+
+        .status-running {
+            background-color: #fef3c7;
+            color: var(--warning-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-robot me-2"></i>
+                AI DevOps Platform
+            </a>
+            <div class="navbar-nav ms-auto">
+                <button class="btn refresh-btn" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt me-2"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="h3 mb-0">Analytics Dashboard</h1>
+                <p class="text-muted">Real-time insights into your AI-powered testing platform</p>
+            </div>
+            <div class="col-auto">
+                <div class="d-flex align-items-center text-muted">
+                    <i class="fas fa-clock me-2"></i>
+                    <span id="lastUpdated">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overview Metrics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-label">Tests Today</div>
+                    <div class="metric-value text-primary" id="testsToday">-</div>
+                    <div class="metric-change trend-up" id="testsTodayChange">
+                        <i class="fas fa-arrow-up me-1"></i>+0
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-label">Success Rate</div>
+                    <div class="metric-value text-success" id="successRate">-%</div>
+                    <div class="metric-change trend-up" id="successRateChange">
+                        <i class="fas fa-arrow-up me-1"></i>+0%
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-label">Avg Duration</div>
+                    <div class="metric-value text-info" id="avgDuration">-s</div>
+                    <div class="metric-change trend-down" id="avgDurationChange">
+                        <i class="fas fa-arrow-down me-1"></i>-0s
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-label">Tests This Week</div>
+                    <div class="metric-value text-warning" id="testsWeek">-</div>
+                    <div class="metric-change trend-up" id="testsWeekChange">
+                        <i class="fas fa-arrow-up me-1"></i>+0
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <!-- Daily Trend Chart -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Daily Test Trends
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="dailyTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Platform Distribution -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-pie me-2"></i>
+                            Platform Distribution
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="platformChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity & AI Insights -->
+        <div class="row mb-4">
+            <!-- Recent Test Executions -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-clock me-2"></i>
+                            Recent Test Executions
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="recentExecutions">
+                            <div class="text-center p-4">
+                                <div class="loading-spinner"></div>
+                                <p class="text-muted mt-2">Loading recent executions...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            AI Insights & Suggestions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="aiInsights">
+                            <div class="text-center p-4">
+                                <div class="loading-spinner"></div>
+                                <p class="text-muted mt-2">Generating AI insights...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance & Error Analysis -->
+        <div class="row mb-4">
+            <!-- Hourly Activity -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Hourly Test Activity (Last 24h)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="hourlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Type Distribution -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-tasks me-2"></i>
+                            Test Types
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="testTypeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Global variables
+        let dashboardData = null;
+        let charts = {};
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(loadDashboardData, 30000);
+        });
+
+        // Load dashboard data from API
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/v1/analytics/dashboard');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                dashboardData = await response.json();
+                updateDashboard();
+                updateLastUpdated();
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showError('Failed to load dashboard data. Please check your connection.');
+            }
+        }
+
+        // Update dashboard with new data
+        function updateDashboard() {
+            if (!dashboardData) return;
+
+            // Update overview metrics
+            updateOverviewMetrics();
+            
+            // Update charts
+            updateCharts();
+            
+            // Update recent activities
+            updateRecentActivities();
+            
+            // Update AI insights
+            updateAIInsights();
+        }
+
+        // Update overview metrics cards
+        function updateOverviewMetrics() {
+            document.getElementById('testsToday').textContent = dashboardData.total_tests_today || 0;
+            document.getElementById('testsWeek').textContent = dashboardData.total_tests_week || 0;
+            document.getElementById('successRate').textContent = `${(dashboardData.success_rate_today || 0).toFixed(1)}%`;
+            document.getElementById('avgDuration').textContent = dashboardData.average_duration_today 
+                ? `${dashboardData.average_duration_today.toFixed(1)}s` 
+                : '-';
+
+            // Update trend indicators (simplified)
+            const todayVsWeek = dashboardData.total_tests_today / (dashboardData.total_tests_week / 7);
+            document.getElementById('testsTodayChange').innerHTML = todayVsWeek > 1 
+                ? '<i class="fas fa-arrow-up me-1"></i>Higher than average'
+                : '<i class="fas fa-arrow-down me-1"></i>Lower than average';
+        }
+
+        // Update all charts
+        function updateCharts() {
+            updateDailyTrendChart();
+            updatePlatformChart();
+            updateHourlyChart();
+            updateTestTypeChart();
+        }
+
+        // Update daily trend chart
+        function updateDailyTrendChart() {
+            const ctx = document.getElementById('dailyTrendChart').getContext('2d');
+            
+            if (charts.dailyTrend) {
+                charts.dailyTrend.destroy();
+            }
+
+            const trendData = dashboardData.daily_trend || [];
+            
+            charts.dailyTrend = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: trendData.map(d => new Date(d.date).toLocaleDateString()),
+                    datasets: [
+                        {
+                            label: 'Total Tests',
+                            data: trendData.map(d => d.total),
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Success Rate (%)',
+                            data: trendData.map(d => d.success_rate),
+                            borderColor: '#16a34a',
+                            backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Tests'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Success Rate (%)'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update platform distribution chart
+        function updatePlatformChart() {
+            const ctx = document.getElementById('platformChart').getContext('2d');
+            
+            if (charts.platform) {
+                charts.platform.destroy();
+            }
+
+            const platformData = dashboardData.platform_distribution || {};
+            const labels = Object.keys(platformData);
+            const data = Object.values(platformData);
+            
+            charts.platform = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#8b5cf6',
+                            '#06b6d4'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update hourly activity chart
+        function updateHourlyChart() {
+            const ctx = document.getElementById('hourlyChart').getContext('2d');
+            
+            if (charts.hourly) {
+                charts.hourly.destroy();
+            }
+
+            const hourlyData = dashboardData.hourly_trend || [];
+            
+            charts.hourly = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: hourlyData.map(d => `${d.hour}:00`),
+                    datasets: [{
+                        label: 'Tests Executed',
+                        data: hourlyData.map(d => d.total),
+                        backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                        borderColor: '#2563eb',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update test type chart
+        function updateTestTypeChart() {
+            const ctx = document.getElementById('testTypeChart').getContext('2d');
+            
+            if (charts.testType) {
+                charts.testType.destroy();
+            }
+
+            const testTypeData = dashboardData.test_type_distribution || {};
+            const labels = Object.keys(testTypeData);
+            const data = Object.values(testTypeData);
+            
+            charts.testType = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#3b82f6',
+                            '#8b5cf6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update recent activities section
+        function updateRecentActivities() {
+            const container = document.getElementById('recentExecutions');
+            const executions = dashboardData.recent_executions || [];
+            
+            if (executions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-4">
+                        <i class="fas fa-inbox text-muted" style="font-size: 2rem;"></i>
+                        <p class="text-muted mt-2">No recent test executions</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = executions.slice(0, 10).map(execution => {
+                const statusClass = execution.status === 'passed' ? 'success' : 
+                                  execution.status === 'failed' ? 'error' : 'warning';
+                const statusIcon = execution.status === 'passed' ? 'fa-check' : 
+                                 execution.status === 'failed' ? 'fa-times' : 'fa-clock';
+                
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon ${statusClass}">
+                            <i class="fas ${statusIcon}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">${execution.test_name}</h6>
+                                    <small class="text-muted">
+                                        ${execution.platform ? `<span class="platform-badge platform-${execution.platform}">${execution.platform}</span>` : ''}
+                                        ${execution.test_type}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="status-badge status-${execution.status}">${execution.status}</span>
+                                    <div class="small text-muted mt-1">
+                                        ${execution.duration ? `${execution.duration.toFixed(1)}s` : '-'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update AI insights section
+        function updateAIInsights() {
+            const container = document.getElementById('aiInsights');
+            const insights = dashboardData.ai_insights || [];
+            const suggestions = dashboardData.improvement_suggestions || [];
+            
+            if (insights.length === 0 && suggestions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-4">
+                        <i class="fas fa-robot text-muted" style="font-size: 2rem;"></i>
+                        <p class="text-muted mt-2">No AI insights available</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            // Add insights
+            insights.forEach(insight => {
+                const cardClass = insight.type === 'warning' ? 'warning' : '';
+                html += `
+                    <div class="insight-card card ${cardClass} mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                ${insight.title}
+                            </h6>
+                            <p class="card-text">${insight.message}</p>
+                            ${insight.action ? `<small class="text-muted"><strong>Action:</strong> ${insight.action}</small>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Add suggestions
+            if (suggestions.length > 0) {
+                html += `
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-magic me-2"></i>
+                                Improvement Suggestions
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                ${suggestions.map(suggestion => `
+                                    <li class="mb-2">
+                                        <i class="fas fa-arrow-right text-primary me-2"></i>
+                                        ${suggestion}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Update last updated timestamp
+        function updateLastUpdated() {
+            document.getElementById('lastUpdated').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
+
+        // Refresh dashboard manually
+        function refreshDashboard() {
+            const btn = document.querySelector('.refresh-btn');
+            const originalHtml = btn.innerHTML;
+            
+            btn.innerHTML = '<div class="loading-spinner"></div> Refreshing...';
+            btn.disabled = true;
+            
+            loadDashboardData().finally(() => {
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                }, 1000);
+            });
+        }
+
+        // Show error message
+        function showError(message) {
+            const alertHtml = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            document.querySelector('.container').insertAdjacentHTML('afterbegin', alertHtml);
+        }
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 """
-AI Engine - OpenAI GPT-3.5-turbo Integration
-Natural Language Processing ve Command Parsing
+AI Engine - Multi-Model AI Integration
+Natural Language Processing ve Command Parsing with multiple AI providers
 """
 
 import logging
@@ -8,6 +8,10 @@ from typing import Dict, Any, List, Optional
 from pydantic import BaseModel
 import json
 import re
+import asyncio
+
+from app.integrations.multi_ai_client import multi_ai_manager, AIResponse
+from app.core.ai_engine_multi import MultiAIEngineMixin
 
 logger = logging.getLogger(__name__)
 
@@ -30,11 +34,13 @@ class AICommand(BaseModel):
     parameters: Dict[str, Any] = {}
     confidence: float = 0.0
 
-class AIEngine:
-    """AI Engine - OpenAI GPT-3.5-turbo entegrasyonu"""
+class AIEngine(MultiAIEngineMixin):
+    """AI Engine - Multi-Model AI Integration"""
     
-    def __init__(self, openai_client):
-        self.openai_client = openai_client
+    def __init__(self, openai_client=None):
+        self.openai_client = openai_client  # Backward compatibility
+        self.multi_ai_manager = multi_ai_manager
+        self.preferred_model = None  # Auto-select best available model
         self.supported_platforms = ["instagram", "facebook", "twitter", "linkedin", "youtube", "tiktok"]
         self.test_types = ["ui", "functional", "performance", "security", "accessibility", "e2e"]
         
@@ -48,11 +54,11 @@ class AIEngine:
             "tiktok": ["tiktok", "tt", "short", "video"]
         }
     
-    async def process_command(self, command: str, context: Dict[str, Any] = {}) -> AICommand:
-        """Doğal dil komutunu işle ve yapılandırılmış komuta dönüştür"""
+    async def process_command(self, command: str, context: Dict[str, Any] = {}, model: Optional[str] = None) -> AICommand:
+        """Doğal dil komutunu işle ve yapılandırılmış komuta dönüştür - Multi-model support"""
         try:
-            # OpenAI ile komut analizi
-            analysis = await self._analyze_command_with_openai(command, context)
+            # Multi-AI ile komut analizi
+            analysis = await self._analyze_command_with_multi_ai(command, context, model)
             
             # Sonucu AICommand modeline dönüştür
             ai_command = AICommand(
@@ -64,7 +70,7 @@ class AIEngine:
                 confidence=analysis.get("confidence", 0.0)
             )
             
-            logger.info(f"Command processed: {ai_command}")
+            logger.info(f"Command processed with {analysis.get('model', 'unknown')} model: {ai_command}")
             return ai_command
             
         except Exception as e:
@@ -72,15 +78,15 @@ class AIEngine:
             # Fallback parsing
             return self._fallback_parsing(command)
     
-    async def generate_test_strategy(self, ai_command: AICommand) -> TestStrategy:
-        """AI komutuna göre test stratejisi oluştur"""
+    async def generate_test_strategy(self, ai_command: AICommand, model: Optional[str] = None) -> TestStrategy:
+        """AI komutuna göre test stratejisi oluştur - Multi-model support"""
         try:
             # Platform-specific test stratejisi
             if ai_command.platform == "instagram":
                 return await self._generate_instagram_strategy(ai_command)
             
-            # OpenAI ile genel test stratejisi oluştur
-            strategy_data = await self._generate_strategy_with_openai(ai_command)
+            # Multi-AI ile genel test stratejisi oluştur
+            strategy_data = await self._generate_strategy_with_multi_ai(ai_command, model)
             
             test_strategy = TestStrategy(
                 platform=ai_command.platform or "web",
@@ -92,7 +98,7 @@ class AIEngine:
                 test_scenarios=strategy_data.get("test_scenarios", [])
             )
             
-            logger.info(f"Test strategy generated: {test_strategy}")
+            logger.info(f"Test strategy generated with multi-AI: {test_strategy}")
             return test_strategy
             
         except Exception as e:

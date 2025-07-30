@@ -5,8 +5,9 @@ AI-Powered DevOps Testing Platform
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, validator
 import uvicorn
 from typing import Dict, Any, Optional, List
@@ -23,6 +24,16 @@ import aiofiles
 from app.integrations.openai_client import OpenAIClient
 from app.core.ai_engine import AIEngine
 from app.modules.web_automation import WebAutomation, TestResult
+
+# Import API routers
+from app.api.v1.analytics import router as analytics_router
+from app.api.v1.multi_ai import router as multi_ai_router
+from app.api.v1.auth import router as auth_router
+from app.api.v1.performance import router as performance_router
+
+# Import performance monitoring
+from app.core.performance import performance_monitor, monitor_endpoint
+from app.core.cache import cache_manager
 
 # Load environment variables
 load_dotenv()
@@ -49,12 +60,45 @@ app.add_middleware(
     allow_headers=cors_config["allow_headers"],
 )
 
+# Performance monitoring middleware
+@app.middleware("http")
+async def performance_monitoring_middleware(request: Request, call_next):
+    """Middleware to monitor API performance"""
+    start_time = time.time()
+    
+    response = await call_next(request)
+    
+    # Record performance metrics
+    response_time = time.time() - start_time
+    endpoint = f"{request.method} {request.url.path}"
+    
+    performance_monitor.record_request(
+        endpoint=endpoint,
+        response_time=response_time,
+        status_code=response.status_code
+    )
+    
+    # Add performance headers
+    response.headers["X-Response-Time"] = f"{response_time:.4f}"
+    response.headers["X-Process-Time"] = str(int(response_time * 1000))
+    
+    return response
+
 # Custom JSON Encoder for datetime objects
 class DateTimeEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
         return super().default(obj)
+
+# Include API routers
+app.include_router(analytics_router)
+app.include_router(multi_ai_router)
+app.include_router(auth_router)
+app.include_router(performance_router)
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Initialize AI components
 openai_client = OpenAIClient()
@@ -630,6 +674,11 @@ async def get_automation_status():
             detail=str(e)
         )
 
+@app.get("/dashboard")
+async def serve_dashboard():
+    """Serve the analytics dashboard"""
+    return FileResponse("static/dashboard.html")
+
 @app.get("/hello")
 async def hello_world():
     return {"message": "Hello World!"}
@@ -640,6 +689,7 @@ async def root():
         "message": "Welcome to AI DevOps Platform",
         "version": "1.0.0",
         "endpoints": {
+            "dashboard": "/dashboard",
             "health": "/health",
             "hello": "/hello",
             "ai_command": "/api/v1/ai/command",
@@ -649,20 +699,80 @@ async def root():
             "automation_status": "/api/v1/automation/status",
             "reports": "/api/v1/reports",
             "report_detail": "/api/v1/reports/{filename}",
+            "analytics": "/api/v1/analytics/dashboard",
+            "multi_ai": "/api/v1/multi-ai/models",
+            "ai_generation": "/api/v1/multi-ai/generate",
+            "auth_register": "/api/v1/auth/register",
+            "auth_login": "/api/v1/auth/login",
+            "auth_oauth": "/api/v1/auth/oauth/{provider}",
+            "auth_profile": "/api/v1/auth/me",
+            "performance_metrics": "/api/v1/performance/metrics",
+            "performance_health": "/api/v1/performance/health",
+            "performance_benchmark": "/api/v1/performance/benchmark",
             "docs": "/docs"
         },
         "features": [
             "Natural Language Command Processing",
-            "AI-Powered Test Strategy Generation",
+            "Multi-Model AI Support (OpenAI, Claude, Gemini)",
+            "OAuth2 Authentication & User Management",
+            "Advanced Analytics Dashboard",
+            "AI-Powered Test Strategy Generation", 
             "Selenium Web Automation",
             "Instagram and Social Media Testing",
             "Structured Test Reports",
-            "OpenAI GPT-3.5-turbo Integration",
             "Real-time Test Execution",
-            "Screenshot and Performance Monitoring"
+            "AI Insights and Optimization",
+            "Cost-Optimized AI Usage",
+            "Screenshot and Performance Monitoring",
+            "JWT Token Authentication",
+            "Role-Based Access Control (RBAC)",
+            "Redis Caching System",
+            "Real-time Performance Metrics",
+            "Database Connection Pooling",
+            "Automated Performance Benchmarking"
         ],
         "timestamp": datetime.now().isoformat()
     }
+
+# Startup and shutdown events
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup"""
+    try:
+        # Initialize cache
+        await cache_manager.init_redis()
+        logger.info("Cache system initialized")
+        
+        # Log startup metrics
+        performance_monitor.record_metric(
+            name="application_startup",
+            value=1,
+            unit="event",
+            tags={"event": "startup"}
+        )
+        
+        logger.info("Application startup completed")
+        
+    except Exception as e:
+        logger.error(f"Startup error: {e}")
+        raise
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup on shutdown"""
+    try:
+        # Log shutdown metrics
+        performance_monitor.record_metric(
+            name="application_shutdown",
+            value=1,
+            unit="event",
+            tags={"event": "shutdown"}
+        )
+        
+        logger.info("Application shutdown completed")
+        
+    except Exception as e:
+        logger.error(f"Shutdown error: {e}")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) 
